@@ -36,19 +36,24 @@ def forward_propagation_placeholder():
 	[Node: input = Placeholder[dtype=DT_FLOAT, shape=[3,2], _device="/job:localhost/replica:0/task:0/device:CPU:0"]()]]
 	"""
 	w1 = tf.Variable(tf.random_normal([2,3], stddev=1, seed=1))
+	# w1 = tf.Variable(tf.zeros([2,3]),dtype=tf.float32)
 	w2 = tf.Variable(tf.random_normal([3,1], stddev=1, seed=1))
+	# w2 = tf.Variable(tf.zeros([3,1]),dtype=tf.float32)
 	# x = tf.constant([[0.7, 0.9]])
-	x = tf.placeholder(tf.float32, shape=(3,2), name="input")
+	x = tf.placeholder(tf.float32, shape=(None,2), name="input")
 
 	a = tf.matmul(x, w1)
 	y = tf.matmul(a, w2)
+
 	with tf.Session() as sess:		
-		# sess.run(w1.initializer)
-		# sess.run(w2.initializer)
+	# 	# sess.run(w1.initializer)
+	# 	# sess.run(w2.initializer)
 		init_op = tf.global_variables_initializer()
 		sess.run(init_op)
-		sess.run(y, feed_dict={x: [[0.7, 0.9], [0.1, 0.4], [0.5, 0.8]]})
-		print(y.eval())
+		s_x = np.array([[0.7, 0.9], [0.1, 0.4], [0.5, 0.8]])
+		y_val = sess.run(y, feed_dict={x: s_x})
+		print(y_val)
+	#print(y.eval())
 
 
 def some_tf_functions():
@@ -65,4 +70,6 @@ def some_tf_functions():
 
 if __name__ == "__main__":
 	os.environ["TF_CPP_MIN_LOG_LEVEL"]='3'
-	some_tf_functions()
+	# some_tf_functions()
+	# forward_propagation()
+	forward_propagation_placeholder()
