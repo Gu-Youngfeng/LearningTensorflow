@@ -52,6 +52,23 @@ def build_perceptron(train_set, test_set):
 	# learning_rate = tf.train.exponential_decay(0.1, global_step, 100, 0.96, staircase=True)
 	# train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
+	# define the accuarcy
+	correct_pred = tf.equal(y_predicted, y)
+	accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+	tp = tf.reduce_sum(tf.multiply(y, y_predicted))
+	tn = tf.reduce_sum(tf.cast(tf.equal(y,y_predicted), tf.float32)) - tp
+	fp = tf.reduce_sum(tf.cast(tf.greater(y_predicted, y), tf.float32))
+	fn = tf.reduce_sum(tf.cast(tf.greater(y, y_predicted), tf.float32))
+
+	precision_1 = tp/(tp + fp)
+	recall_1 = tp/(tp + fn)
+	fmeasure_1 = precision_1*recall_1*2/(precision_1 + recall_1)
+
+	precision_0 = tn/(tn + fn)
+	recall_0 = tn/(tn + fp)
+	fmeasure_0 = precision_0*recall_0*2/(precision_0 + recall_0)
+
 	init = tf.global_variables_initializer()
 	entropy_train = []
 	entropy_test = []
@@ -64,15 +81,23 @@ def build_perceptron(train_set, test_set):
 
 			sess.run(train_step, feed_dict={x:train_features_matrix[start_index:end_index], y:train_labels_matrix[start_index:end_index]})
 
+			train_cross_entropy = sess.run(cross_entropy, feed_dict={x:train_features_matrix, y:train_labels_matrix})
+			entropy_train.append(train_cross_entropy)
+			test_cross_entropy = sess.run(cross_entropy, feed_dict={x:test_features_matrix, y:test_labels_matrix})
+			entropy_test.append(test_cross_entropy)
+
 			if i%50 == 0:
-				train_cross_entropy = sess.run(cross_entropy, feed_dict={x:train_features_matrix, y:train_labels_matrix})
-				entropy_train.append(train_cross_entropy)
-				test_cross_entropy = sess.run(cross_entropy, feed_dict={x:test_features_matrix, y:test_labels_matrix})
-				entropy_test.append(test_cross_entropy)
 				print("ROUND:", i, "CROSS_ENTROPY:", train_cross_entropy, "CROSS_ENTROPY:", test_cross_entropy)
 
 		# model = tf.train.Saver()
 		# saver.save(sess, "model/perceptron")
+		print("[accuracy]:", sess.run(accuracy, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[precision_1]:", sess.run(precision_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[recall_1]:", sess.run(recall_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[fmeasure_1]:", sess.run(fmeasure_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[precision_0]:", sess.run(precision_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[recall_0]:", sess.run(recall_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		print("[fmeasure_0]:", sess.run(fmeasure_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
 
 	# draw the trade of cross_entropy with learining round
 	import matplotlib.pyplot as plt
@@ -86,4 +111,5 @@ def build_perceptron(train_set, test_set):
 if __name__ == "__main__":
 	train_set, test_set = csv_reader.read_from("data/CM1.csv", 0.9)
 	build_perceptron(train_set, test_set)
+
 
