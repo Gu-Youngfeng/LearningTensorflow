@@ -47,7 +47,7 @@ def normalize(samples, norm_type=0):
 	return samples
 
 
-def read_from(path, ratio):
+def read_from_path_by_ratio(path, ratio):
 	# is path valid?
 	if os.path.exists(path)==False:
 		print("[ERROR]: CANNOT FIND DATASET IN PATH:", path)
@@ -87,5 +87,36 @@ def read_from(path, ratio):
 	return [train_set, test_set]
 
 
+def read_from_path(path):
+	# is path valid?
+	if os.path.exists(path)==False:
+		print("[ERROR]: CANNOT FIND DATASET IN PATH:", path)
+		return None
+
+	content = pd.read_csv(path)
+	features = content.columns[:-1].tolist()
+	labels = content.columns[-1]
+	tol_size = len(content)
+
+	print("# DATASET INFORMATION\n------------------------------------------")
+	print("[PATH]:    ", path)
+	print("[FEATURES]:",features)
+	print("[LABELS]:  ", labels)
+	print("[SIZE]:    ", tol_size)
+
+	samples = []
+	for i in range(tol_size):
+		sample = Sample(content.iloc[i][:-1].tolist(), content.iloc[i][-1])
+		samples.append(sample)
+
+	# normalization
+	samples = normalize(samples)
+	# randomization
+	np.random.shuffle(samples)
+
+	return samples
+
+
 if __name__ == "__main__":
-	read_from("data/CM1.csv",0.95)
+	read_from_path("data/CM1.csv")
+	read_from_path_by_ratio("data/CM1.csv", 0.9)

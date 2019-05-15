@@ -15,6 +15,12 @@ learning_round = 1000
 regular_lambda = 0.01
 
 def build_perceptron(train_set, test_set):
+	"""
+	build simple neural network with 3 basic layers
+	framework: input: (None, 21) -> hidden: (21, 128) -> output: (128, 1)
+	act-func : ReLu()
+	regular  : L2 (0.01)
+	"""
 	train_size = len(train_set)
 	test_size = len(test_set)
 
@@ -56,6 +62,9 @@ def build_perceptron(train_set, test_set):
 	# train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
 	# define the accuarcy
+	# here we use the ReLu active function, then we have to transfer the original y_predicted into a new one
+	# for other active functions, please refer to issue#2 "How to calculate the Precision, Recall and F1-Measure in Tensorflow?"
+	# https://github.com/Gu-Youngfeng/LearningTensorflow/issues/2
 	y_predicted = tf.cast(tf.not_equal(y_predicted, 0.0), tf.float32)
 	correct_pred = tf.equal(y_predicted, y)
 	accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
@@ -113,7 +122,7 @@ def build_perceptron(train_set, test_set):
 
 
 if __name__ == "__main__":
-	train_set, test_set = csv_reader.read_from("data/CM1.csv", 0.9)
+	train_set, test_set = csv_reader.read_from_path_by_ratio("data/CM1.csv", 0.9)
 	build_perceptron(train_set, test_set)
 
 
