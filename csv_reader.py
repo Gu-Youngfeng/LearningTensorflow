@@ -118,5 +118,5 @@ def read_from_path(path):
 
 
 if __name__ == "__main__":
-	read_from_path("data/CM1.csv")
-	read_from_path_by_ratio("data/CM1.csv", 0.9)
+	samples_full = read_from_path("data/CM1.csv")
+	samples_partial = read_from_path_by_ratio("data/CM1.csv", 0.9)
