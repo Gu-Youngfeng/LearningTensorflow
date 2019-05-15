@@ -88,4 +88,4 @@ def read_from(path, ratio):
 
 
 if __name__ == "__main__":
-	read_from("data/CM1.csv",0.9)
+	read_from("data/CM1.csv",0.95)

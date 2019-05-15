@@ -12,6 +12,7 @@ hyper-peremeter setting
 batch_size = 20
 learning_rate = 0.001
 learning_round = 1000
+regular_lambda = 0.01
 
 def build_perceptron(train_set, test_set):
 	train_size = len(train_set)
@@ -35,14 +36,16 @@ def build_perceptron(train_set, test_set):
 	weight_0 = tf.Variable(tf.random_uniform(shape=(21,128), minval=0, maxval=1, dtype=tf.float32))
 	weight_1 = tf.Variable(tf.random_uniform(shape=(128,1), minval=0, maxval=1, dtype=tf.float32))
 
+	# biase_0 = tf.Variable(tf.zeros([128]))
+	# biase_1 = tf.Variable(tf.zeros([1]))
 	biase_0 = tf.Variable(tf.random_uniform(shape=(1,128), minval=0, maxval=1, dtype=tf.float32))
 	biase_1 = tf.Variable(tf.random_uniform(shape=(1,1), minval=0, maxval=1, dtype=tf.float32))
 	# framework of NN
 	hidden_layer = tf.nn.relu(tf.matmul(x, weight_0) + biase_0)
 	y_predicted = tf.nn.relu(tf.matmul(hidden_layer, weight_1) + biase_1)
+
 	# loss function of NN
-	# cross_entropy = tf.reduce_mean(tf.square(y - y_predicted)) + tf.contrib.layers.l2_regularizer(0.5)(weight_0)
-	cross_entropy = tf.reduce_mean(tf.square(y - y_predicted)) 
+	cross_entropy = tf.reduce_mean(tf.square(y - y_predicted)) + tf.contrib.layers.l2_regularizer(regular_lambda)(weight_0) + tf.contrib.layers.l2_regularizer(regular_lambda)(weight_1)
 	train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 	
 	# # L2 regularizer
@@ -53,6 +56,7 @@ def build_perceptron(train_set, test_set):
 	# train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
 	# define the accuarcy
+	y_predicted = tf.cast(tf.not_equal(y_predicted, 0.0), tf.float32)
 	correct_pred = tf.equal(y_predicted, y)
 	accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
@@ -89,21 +93,21 @@ def build_perceptron(train_set, test_set):
 			if i%50 == 0:
 				print("ROUND:", i, "CROSS_ENTROPY:", train_cross_entropy, "CROSS_ENTROPY:", test_cross_entropy)
 
-		# model = tf.train.Saver()
-		# saver.save(sess, "model/perceptron")
-		print("[accuracy]:", sess.run(accuracy, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[precision_1]:", sess.run(precision_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[recall_1]:", sess.run(recall_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[fmeasure_1]:", sess.run(fmeasure_1, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[precision_0]:", sess.run(precision_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[recall_0]:", sess.run(recall_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
-		print("[fmeasure_0]:", sess.run(fmeasure_0, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		precision_1, recall_1, fmeasure_1, precision_0, recall_0, fmeasure_0, accuracy = sess.run([precision_1, recall_1, fmeasure_1, precision_0, recall_0, fmeasure_0, accuracy], feed_dict={x:test_features_matrix, y:test_labels_matrix})
+		print("[PREDICTION]:", precision_1, recall_1, fmeasure_1, precision_0, recall_0, fmeasure_0, accuracy)
+
+		# print the predicted labels and real labels
+		# print(sess.run(y_predicted, feed_dict={x:test_features_matrix, y:test_labels_matrix}))
+		# print("-----")
+		# print(test_labels_matrix)
 
 	# draw the trade of cross_entropy with learining round
 	import matplotlib.pyplot as plt
 	x = range(len(entropy_train))
 	plt.plot(x, entropy_train)
 	plt.plot(x, entropy_test)
+	plt.xlabel("Learning rounds")
+	plt.ylabel("Cross entropy")
 	plt.legend(["entropy on the training set", "entropy on the testing set"])
 	plt.show()
 
