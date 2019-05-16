@@ -42,12 +42,12 @@ def read_seq_from_txt(path):
 					continue
 				if flag:
 					if txt_line.startswith("OutTrace"):
-						labels.append(0.0)
+						labels.append([0.0])
 						features.append(sequences)
 						sequences = []
 						flag = False
 					elif txt_line.startswith("InTrace"):
-						labels.append(1.0)
+						labels.append([1.0])
 						features.append(sequences)
 						sequences = []
 						flag = False
