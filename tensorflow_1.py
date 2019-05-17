@@ -7,7 +7,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 """
-hyper-peremeter setting
+hyper-parameter setting
 """
 batch_size = 20
 learning_rate = 0.001

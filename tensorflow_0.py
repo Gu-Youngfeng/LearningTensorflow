@@ -63,7 +63,7 @@ def try_tensorflow():
 		print(sess.run(matrix_2), "\n")
 
 
-def try_graph():
+def try_graph_1():
 	with tf.name_scope("add"):
 		a = tf.Variable(tf.random_normal(shape=(2,5), mean=0, stddev=1), name="input_1")
 		b = tf.Variable(tf.random_uniform(shape=(2,5), minval=0, maxval=1), name="input_2")
@@ -80,6 +80,28 @@ def try_graph():
 		Step-1: run "tensorboard --logdir=path/to/your/log-file" in terminate
 		Step-2: visit "localhost:6006" in browser
 		"""
+		writer = tf.summary.FileWriter("vis_log/", sess.graph)
+		writer.close()
+
+
+def try_graph_2():
+
+	x = tf.constant([[3.0, 4.0]])
+
+	weight_0 = tf.Variable(tf.random_normal(shape=(2,5), mean=0, stddev=1), name="weight_0")
+	weight_1 = tf.Variable(tf.random_uniform(shape=(5,1), minval=0, maxval=1), name="weight_1")
+
+	biase_0 = tf.Variable(tf.random_normal(shape=(1,5), mean=0, stddev=1), "biase_0")
+	biase_1 = tf.Variable(tf.random_uniform(shape=(1,1), minval=0, maxval=1), name="biase_1")
+
+	layer_1 = tf.matmul(x, weight_0) + biase_0
+	output = tf.matmul(layer_1, weight_1) + biase_1
+
+	# variables initialization
+	init = tf.global_variables_initializer()
+	# open a session
+	with tf.Session() as sess:
+		sess.run(init)
 		writer = tf.summary.FileWriter("vis_log/", sess.graph)
 		writer.close()
 
@@ -108,6 +130,6 @@ if __name__ == "__main__":
 	# test tensorflow
 	# try_tensorflow()
 	# test graph
-	# try_graph()
+	try_graph_2()
 	# test simple network
-	try_simple_network()
+	# try_simple_network()

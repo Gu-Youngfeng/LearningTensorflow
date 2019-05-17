@@ -9,7 +9,7 @@ from keras.preprocessing.sequence import pad_sequences
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 """
-hyper-peremeter setting
+hyper-parameter setting
 """
 lstm_hidden_size = 128
 batch_size = 4
@@ -26,6 +26,16 @@ def cal_length(seq):
 
 
 def build_simple_lstm(features_train, labels_train, features_test, labels_test):
+	"""
+	build a simple lstm model on sequential data, the main framework is,
+	----------------------------------------------
+                                       h
+                                       |
+	{lstm-1} -> {lstm-2} -> ... -> {lstm-10}
+	   |           |                   |
+	[1,2,..]    [2,3,..]    ...     [3,4,..]
+	----------------------------------------------
+	"""
 	# train set input transformation
 	features_train = np.array(features_train)
 	features_train = pad_sequences(features_train, padding='post', maxlen=sequence_size) # padding with 0
